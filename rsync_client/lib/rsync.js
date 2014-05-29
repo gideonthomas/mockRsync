@@ -1,5 +1,5 @@
-var Path = Filer.FileSystem.Path,
-    Errors = Filer.FileSystem.Errors,
+var Path = Filer.Path,
+    Errors = Filer.Errors,
     cache = {},
     rsync = {};
 
@@ -212,7 +212,7 @@ function checksum (path, options, callback) {
   });
 }
 
-rsync.sourceList = function getSrcList(srcFs, path, options, callback) {
+rsync.sourceList = function(srcFS, path, options, callback) {
   configure.call(options);
   var result = [];
   srcFS.lstat(path, function(err, stats) {
@@ -243,7 +243,7 @@ rsync.sourceList = function getSrcList(srcFs, path, options, callback) {
               type: stats.type
             };
             if(options.recursive && stats.isDirectory()) {
-              getSrcList(name, function(error, items) {
+              rsync.sourceList(srcFS, name, options, function(error, items) {
                 if(error) {
                   callback(error);
                   return;
@@ -379,7 +379,7 @@ rsync.diff = function(fs, path, checksums, options, callback) {
       }); 
     }
     else if (stat.isFile() || !options.links) {
-      fs.readFile(path, function (err, data) {
+      fs.readFile(path, 'utf8', function (err, data) {
         if (err) { return callback(err); }
         diffs.push({
           diff: roll(data, checksums[0].checksum, options.size),
@@ -413,7 +413,7 @@ rsync.diff = function(fs, path, checksums, options, callback) {
 
   function getDiff(entry, callback) {
     if(entry.hasOwnProperty('contents')) {
-      rsync.diff(fs, Path.join(path, entry.path), entry.contents, function(err, stuff) {
+      rsync.diff(fs, Path.join(path, entry.path), entry.contents, options, function(err, stuff) {
         if(err) {
           callback(err);
           return;

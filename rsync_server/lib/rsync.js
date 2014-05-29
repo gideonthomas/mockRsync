@@ -1,5 +1,6 @@
-var Path = require('filer').FileSystem.Path,
-    Errors = require('filer').FileSystem.Errors,
+var Filer = require('filer'),
+    Path = Filer.Path,
+    Errors = Filer.Errors,
     CryptoJS = require('crypto-js'),
     async = require('async'),
     cache = {},
@@ -289,7 +290,7 @@ rsync.checksums = function(fs, destPath, srcList, options, callback) {
     function getDirChecksums(entry, callback) {
       var item = { path: entry.path };
       if(options.recursive && entry.type === 'DIRECTORY') {
-        rsync.checksums(Path.join(destPath, entry.path), entry.contents, function(error, items) {
+        rsync.checksums(fs, Path.join(destPath, entry.path), entry.contents, options, function(error, items) {
           if(error) {
             callback(error);
             return;
@@ -478,7 +479,7 @@ rsync.patch = function(fs, path, diff, options, callback) {
     }
     
     if(entry.hasOwnProperty('contents')) {
-      rsync.patch(fs, Path.join(path, entry.path), entry.contents, function(err) {
+      rsync.patch(fs, Path.join(path, entry.path), entry.contents, options, function(err) {
         if(err) {
           callback(err);
           return;

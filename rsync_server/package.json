@@ -15,6 +15,7 @@
     "crypto-js": "^3.1.2-3",
     "express": "^4.3.1",
     "express-session": "^1.2.1",
-    "filer": "0.0.8"
+    "filer": "0.0.8",
+    "nunjucks": "^1.0.5"
   }
 }
